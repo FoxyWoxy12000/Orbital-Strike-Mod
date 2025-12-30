@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "orbital-strike",
+	"version": "${version}",
+	"name": "Orbital Strike",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/orbital-strike/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.orbitalstrike.OrbitalStrike"
+		],
+		"client": [
+			"com.orbitalstrike.OrbitalStrikeClient"
+		],
+		"fabric-datagen": [
+			"com.orbitalstrike.OrbitalStrikeDataGenerator"
+		]
+	},
+	"mixins": [
+		"orbital-strike.mixins.json",
+		{
+			"config": "orbital-strike.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
