@@ -12,9 +12,9 @@ public class NukeMk4Shot implements OrbitalShot {
     private static final Random RANDOM = new Random();
 
     public static int OFFSET_HEIGHT = 100;
-    public static double INNER_RING_MULTIPLIER = 20.0;
-    public static double OUTER_RING_MULTIPLIER = 1.5;
-    public static double IMPERFECTION_PERCENT = 0.15;
+    public static double INNER_RING_MULTIPLIER = 16.0;
+    public static double OUTER_RING_MULTIPLIER = 2.0;
+    public static double IMPERFECTION_PERCENT = 0.20;
 
     @Override
     public String id() {
@@ -24,8 +24,7 @@ public class NukeMk4Shot implements OrbitalShot {
     @Override
     public void fire(ServerWorld world, Vec3d pos, int size) {
         if (size > 32) {
-            //size = 32;
-            //actually just tell a warning and make the player run the comamnd again to confirm
+            size = 32;
         }
 
         double spawnY = pos.y + OFFSET_HEIGHT;
@@ -38,17 +37,20 @@ public class NukeMk4Shot implements OrbitalShot {
         int rings = size;
         for (int ring = 1; ring <= rings; ring++) {
             double targetRadius = ring * OUTER_RING_MULTIPLIER;
-            int tntInThisRing = (int)(INNER_RING_MULTIPLIER + (ring * 2));
+            int tntInThisRing = (int)(INNER_RING_MULTIPLIER * ring);
 
             for (int i = 0; i < tntInThisRing; i++) {
                 if (RANDOM.nextDouble() < IMPERFECTION_PERCENT) continue;
 
                 double angle = (2 * Math.PI * i) / tntInThisRing;
 
-                double velocityX = Math.cos(angle) * (targetRadius / 15.0);
-                double velocityZ = Math.sin(angle) * (targetRadius / 15.0);
+                double offsetX = Math.cos(angle) * 0.3;
+                double offsetZ = Math.sin(angle) * 0.3;
 
-                TntEntity tnt = new TntEntity(world, pos.x, spawnY, pos.z, null);
+                double velocityX = Math.cos(angle) * (targetRadius / 25.0);
+                double velocityZ = Math.sin(angle) * (targetRadius / 25.0);
+
+                TntEntity tnt = new TntEntity(world, pos.x + offsetX, spawnY, pos.z + offsetZ, null);
                 tnt.setFuse(110);
                 tnt.setVelocity(velocityX, -0.5, velocityZ);
                 world.spawnEntity(tnt);
