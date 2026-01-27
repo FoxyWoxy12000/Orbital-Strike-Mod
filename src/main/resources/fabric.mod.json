@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.orbitalstrike.core.OrbitalStrike"
+			"com.orbitalstrike.OrbitalStrike"
 		],
 		"client": [
 			"com.orbitalstrike.OrbitalStrikeClient"

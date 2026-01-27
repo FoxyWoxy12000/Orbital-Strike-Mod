@@ -3,7 +3,8 @@
 	"package": "com.orbitalstrike.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"OrbitalStrikeMixin"
+		"OrbitalStrikeMixin",
+		"FishingRodItemMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
