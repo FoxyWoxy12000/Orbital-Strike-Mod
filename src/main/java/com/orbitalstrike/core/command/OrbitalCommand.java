@@ -1,15 +1,13 @@
 package com.orbitalstrike.core.command;
 
-import com.orbitalstrike.core.shot.OrbitalShot;
-import com.orbitalstrike.core.shot.ShotRegistry;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.argument.BlockPosArgumentType;
-import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.util.math.BlockPos;
 
 public class OrbitalCommand {
 
@@ -19,37 +17,112 @@ public class OrbitalCommand {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, env) -> {
             dispatcher.register(
                     CommandManager.literal("orbital")
-                            .then(CommandManager.literal("strike")
+
+                            .then(CommandManager.literal("give")
                                     .then(CommandManager.argument("shot", StringArgumentType.word())
                                             .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
-                                                    .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
-                                                            .executes(ctx -> {
-                                                                ServerCommandSource src = ctx.getSource();
-                                                                String shotId = StringArgumentType.getString(ctx, "shot");
-                                                                int delay = IntegerArgumentType.getInteger(ctx, "delay");
-                                                                BlockPos pos = BlockPosArgumentType.getBlockPos(ctx, "pos");
-                                                                OrbitalShot shot = ShotRegistry.get(shotId);
-                                                                if (shot == null) return 0;
-                                                                shot.fire(src.getWorld(), pos.toCenterPos(), delay, src.getName());
-                                                                return 1;
-                                                            })
+                                                    .then(CommandManager.argument("size", IntegerArgumentType.integer(0))
+                                                            .then(CommandManager.argument("amount", IntegerArgumentType.integer(1))
+                                                                    .executes(OrbitalCommand::give)
+                                                            )
                                                     )
                                             )
                                     )
                             )
-                            .then(CommandManager.literal("setting")
-                                    .then(CommandManager.literal("gamerule")
-                                            .then(CommandManager.literal("missfailsafe")
-                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
-                                                            .executes(ctx -> {
-                                                                MISS_FAILSAFE = BoolArgumentType.getBool(ctx, "value");
-                                                                return 1;
-                                                            })
+
+                            .then(CommandManager.literal("strike")
+                                    .then(CommandManager.argument("shot", StringArgumentType.word())
+                                            .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
+                                                    .then(CommandManager.argument("size", IntegerArgumentType.integer(0))
+                                                            .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                                                                    .executes(OrbitalCommand::strikePos)
+                                                            )
                                                     )
                                             )
+                                    )
+
+                                    .then(CommandManager.literal("crosshair")
+                                            .then(CommandManager.argument("shot", StringArgumentType.word())
+                                                    .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
+                                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(0))
+                                                                    .executes(OrbitalCommand::strikeCrosshair)
+                                                            )
+                                                    )
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("give")
+                                            .then(CommandManager.argument("shot", StringArgumentType.word())
+                                                    .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
+                                                            .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
+                                                                    .executes(OrbitalCommand::giveFixedStrikeRod)
+                                                            )
+                                                    )
+                                            )
+                                    )
+                            )
+
+                            .then(CommandManager.literal("setting")
+                                    .then(CommandManager.argument("setting", StringArgumentType.word())
+                                            .then(CommandManager.argument("value", StringArgumentType.word())
+                                                    .executes(OrbitalCommand::setting)
+                                            )
+                                    )
+                            )
+
+                            .then(CommandManager.literal("help")
+                                    .executes(OrbitalCommand::help)
+                                    .then(CommandManager.literal("setting")
+                                            .executes(OrbitalCommand::helpSetting)
+                                    )
+                            )
+
+                            .then(CommandManager.literal("craft")
+                                    .executes(OrbitalCommand::craft)
+                            )
+
+                            .then(CommandManager.literal("auth")
+                                    .then(CommandManager.argument("player", EntityArgumentType.player())
+                                            .executes(OrbitalCommand::auth)
                                     )
                             )
             );
         });
+    }
+
+    private static int give(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int strikePos(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int strikeCrosshair(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int giveFixedStrikeRod(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int setting(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int help(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int helpSetting(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int craft(CommandContext<ServerCommandSource> ctx) {
+        return 1;
+    }
+
+    private static int auth(CommandContext<ServerCommandSource> ctx) {
+        return 1;
     }
 }

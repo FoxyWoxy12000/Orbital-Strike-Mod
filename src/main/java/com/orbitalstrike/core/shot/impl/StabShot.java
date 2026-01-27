@@ -13,13 +13,10 @@ public class StabShot implements OrbitalShot {
     }
 
     @Override
-    public void fire(ServerWorld world, Vec3d pos, int delay, String owner) {
-        int minY = world.getBottomY();
-        int maxY = world.getTopYInclusive();
-
-        for (int y = minY; y <= maxY; y += 3) {
+    public void fire(ServerWorld world, Vec3d pos, int size) {
+        for (int y = 319; y >= -64; y -= 3) {
             TntEntity tnt = new TntEntity(world, pos.x, y, pos.z, null);
-            tnt.setFuse(delay);
+            tnt.setFuse(0);
             world.spawnEntity(tnt);
         }
     }

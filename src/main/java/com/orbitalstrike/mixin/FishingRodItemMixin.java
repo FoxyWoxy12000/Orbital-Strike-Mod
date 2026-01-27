@@ -48,7 +48,7 @@ public class FishingRodItemMixin {
             return;
         }
 
-        shot.fire((net.minecraft.server.world.ServerWorld) world, hit.getBlockPos().toCenterPos(), delay, owner);
+        shot.fire((net.minecraft.server.world.ServerWorld) world, hit.getBlockPos().toCenterPos(), delay);
         stack.decrement(1);
         cir.setReturnValue(stack);
     }
