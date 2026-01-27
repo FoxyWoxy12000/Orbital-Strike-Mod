@@ -5,7 +5,11 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.entity.TntEntity;
 
+import java.util.Random;
+
 public class StabShot implements OrbitalShot {
+
+    private static final Random RANDOM = new Random();
 
     @Override
     public String id() {
@@ -15,9 +19,20 @@ public class StabShot implements OrbitalShot {
     @Override
     public void fire(ServerWorld world, Vec3d pos, int size) {
         for (int y = 319; y >= -64; y -= 3) {
-            TntEntity tnt = new TntEntity(world, pos.x, y, pos.z, null);
-            tnt.setFuse(0);
-            world.spawnEntity(tnt);
+            for (int i = 0; i < 3; i++) {
+                double offsetX = (RANDOM.nextDouble() - 0.5);
+                double offsetZ = (RANDOM.nextDouble() - 0.5);
+
+                TntEntity tnt = new TntEntity(
+                        world,
+                        pos.x + offsetX,
+                        y,
+                        pos.z + offsetZ,
+                        null
+                );
+                tnt.setFuse(0);
+                world.spawnEntity(tnt);
+            }
         }
     }
 }
