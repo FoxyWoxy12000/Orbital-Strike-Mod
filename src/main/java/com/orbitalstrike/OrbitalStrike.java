@@ -7,6 +7,7 @@ import com.orbitalstrike.fabric.FabricPlatform;
 import com.orbitalstrike.platform.OrbitalPlatform;
 import net.fabricmc.api.ModInitializer;
 import com.orbitalstrike.core.util.StrikeScheduler;
+import com.orbitalstrike.core.shot.impl.NukeMk4Shot;
 
 public class OrbitalStrike implements ModInitializer {
 
@@ -18,7 +19,7 @@ public class OrbitalStrike implements ModInitializer {
         PLATFORM = new FabricPlatform();
         StrikeScheduler.init();
         ShotRegistry.register(new StabShot());
-
+        ShotRegistry.register(new NukeMk4Shot());
         OrbitalCommand.register();
 
     }

@@ -2,6 +2,7 @@ package com.orbitalstrike.core.shot;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ShotRegistry {
 
@@ -13,5 +14,9 @@ public class ShotRegistry {
 
     public static OrbitalShot get(String id) {
         return SHOTS.get(id);
+    }
+
+    public static Set<String> getAllIds() {
+        return SHOTS.keySet();
     }
 }

@@ -3,12 +3,18 @@ package com.orbitalstrike.core.command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.orbitalstrike.core.rod.OrbitalRodUtil;
+import com.orbitalstrike.core.rod.RodTriggerStyle;
 import com.orbitalstrike.core.shot.OrbitalShot;
 import com.orbitalstrike.core.shot.ShotRegistry;
+import com.orbitalstrike.core.shot.impl.NukeMk4Shot;
+import com.orbitalstrike.core.shot.impl.StabShot;
 import com.orbitalstrike.core.util.RaycastUtil;
 import com.orbitalstrike.core.util.StrikeScheduler;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.item.ItemStack;
@@ -22,6 +28,24 @@ import net.minecraft.util.math.BlockPos;
 
 public class OrbitalCommand {
 
+    private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
+            CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
+
+    private static final SuggestionProvider<ServerCommandSource> TRIGGER_STYLE_SUGGESTIONS = (context, builder) ->
+            CommandSource.suggestMatching(new String[]{"instant", "cast", "reel"}, builder);
+
+    private static final SuggestionProvider<ServerCommandSource> SETTING_SUGGESTIONS = (context, builder) ->
+            CommandSource.suggestMatching(new String[]{
+                    "triggerstyle",
+                    "NukeOffsetHeight",
+                    "NukeInnerRingMultiplier",
+                    "NukeOuterRingMultiplier",
+                    "NukeImperfectionPercent",
+                    "StabDepth",
+                    "StabOffset",
+                    "StabAmountPerPiece"
+            }, builder);
+
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, env) -> {
             dispatcher.register(
@@ -29,11 +53,12 @@ public class OrbitalCommand {
 
                             .then(CommandManager.literal("give")
                                     .then(CommandManager.argument("shot", StringArgumentType.word())
+                                            .suggests(SHOT_SUGGESTIONS)
                                             .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
                                                     .then(CommandManager.argument("amount", IntegerArgumentType.integer(1))
                                                             .executes(OrbitalCommand::giveNoSize)
                                                     )
-                                                    .then(CommandManager.argument("size", IntegerArgumentType.integer(0))
+                                                    .then(CommandManager.argument("size", IntegerArgumentType.integer(0, 32))
                                                             .then(CommandManager.argument("amount", IntegerArgumentType.integer(1))
                                                                     .executes(OrbitalCommand::give)
                                                             )
@@ -44,11 +69,12 @@ public class OrbitalCommand {
 
                             .then(CommandManager.literal("strike")
                                     .then(CommandManager.argument("shot", StringArgumentType.word())
+                                            .suggests(SHOT_SUGGESTIONS)
                                             .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
                                                     .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
                                                             .executes(OrbitalCommand::strikePosNoSize)
                                                     )
-                                                    .then(CommandManager.argument("size", IntegerArgumentType.integer(0))
+                                                    .then(CommandManager.argument("size", IntegerArgumentType.integer(0, 32))
                                                             .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
                                                                     .executes(OrbitalCommand::strikePos)
                                                             )
@@ -58,9 +84,10 @@ public class OrbitalCommand {
 
                                     .then(CommandManager.literal("crosshair")
                                             .then(CommandManager.argument("shot", StringArgumentType.word())
+                                                    .suggests(SHOT_SUGGESTIONS)
                                                     .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
                                                             .executes(OrbitalCommand::strikeCrosshairNoSize)
-                                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(0))
+                                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(0, 32))
                                                                     .executes(OrbitalCommand::strikeCrosshair)
                                                             )
                                                     )
@@ -69,11 +96,12 @@ public class OrbitalCommand {
 
                                     .then(CommandManager.literal("give")
                                             .then(CommandManager.argument("shot", StringArgumentType.word())
+                                                    .suggests(SHOT_SUGGESTIONS)
                                                     .then(CommandManager.argument("delay", IntegerArgumentType.integer(0))
                                                             .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
                                                                     .executes(OrbitalCommand::giveFixedStrikeRodNoSize)
                                                             )
-                                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(0))
+                                                            .then(CommandManager.argument("size", IntegerArgumentType.integer(0, 32))
                                                                     .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
                                                                             .executes(OrbitalCommand::giveFixedStrikeRod)
                                                                     )
@@ -84,7 +112,95 @@ public class OrbitalCommand {
                             )
 
                             .then(CommandManager.literal("setting")
+                                    .then(CommandManager.literal("triggerstyle")
+                                            .then(CommandManager.argument("style", StringArgumentType.word())
+                                                    .suggests(TRIGGER_STYLE_SUGGESTIONS)
+                                                    .executes(ctx -> {
+                                                        String style = StringArgumentType.getString(ctx, "style");
+                                                        try {
+                                                            RodTriggerStyle.current = RodTriggerStyle.valueOf(style.toUpperCase());
+                                                            ctx.getSource().sendFeedback(() -> Text.literal("Trigger style set to " + style), false);
+                                                            return 1;
+                                                        } catch (IllegalArgumentException e) {
+                                                            ctx.getSource().sendError(Text.literal("Invalid trigger style. Use: instant, cast, reel"));
+                                                            return 0;
+                                                        }
+                                                    })
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("NukeOffsetHeight")
+                                            .then(CommandManager.argument("value", IntegerArgumentType.integer(0))
+                                                    .executes(ctx -> {
+                                                        NukeMk4Shot.OFFSET_HEIGHT = IntegerArgumentType.getInteger(ctx, "value");
+                                                        ctx.getSource().sendFeedback(() -> Text.literal("Nuke offset height set to " + NukeMk4Shot.OFFSET_HEIGHT), false);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("NukeInnerRingMultiplier")
+                                            .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                    .executes(ctx -> {
+                                                        NukeMk4Shot.INNER_RING_MULTIPLIER = DoubleArgumentType.getDouble(ctx, "value");
+                                                        ctx.getSource().sendFeedback(() -> Text.literal("Nuke inner ring multiplier set to " + NukeMk4Shot.INNER_RING_MULTIPLIER), false);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("NukeOuterRingMultiplier")
+                                            .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                    .executes(ctx -> {
+                                                        NukeMk4Shot.OUTER_RING_MULTIPLIER = DoubleArgumentType.getDouble(ctx, "value");
+                                                        ctx.getSource().sendFeedback(() -> Text.literal("Nuke outer ring multiplier set to " + NukeMk4Shot.OUTER_RING_MULTIPLIER), false);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("NukeImperfectionPercent")
+                                            .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0, 1.0))
+                                                    .executes(ctx -> {
+                                                        NukeMk4Shot.IMPERFECTION_PERCENT = DoubleArgumentType.getDouble(ctx, "value");
+                                                        ctx.getSource().sendFeedback(() -> Text.literal("Nuke imperfection percent set to " + NukeMk4Shot.IMPERFECTION_PERCENT), false);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("StabDepth")
+                                            .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                    .executes(ctx -> {
+                                                        StabShot.DEPTH = IntegerArgumentType.getInteger(ctx, "value");
+                                                        ctx.getSource().sendFeedback(() -> Text.literal("Stab depth set to " + StabShot.DEPTH), false);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("StabOffset")
+                                            .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                    .executes(ctx -> {
+                                                        StabShot.OFFSET = DoubleArgumentType.getDouble(ctx, "value");
+                                                        ctx.getSource().sendFeedback(() -> Text.literal("Stab offset set to " + StabShot.OFFSET), false);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("StabAmountPerPiece")
+                                            .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                    .executes(ctx -> {
+                                                        StabShot.AMOUNT_PER_PIECE = IntegerArgumentType.getInteger(ctx, "value");
+                                                        ctx.getSource().sendFeedback(() -> Text.literal("Stab amount per piece set to " + StabShot.AMOUNT_PER_PIECE), false);
+                                                        return 1;
+                                                    })
+                                            )
+                                    )
+
                                     .then(CommandManager.argument("setting", StringArgumentType.word())
+                                            .suggests(SETTING_SUGGESTIONS)
                                             .then(CommandManager.argument("value", StringArgumentType.word())
                                                     .executes(OrbitalCommand::setting)
                                             )
@@ -124,6 +240,11 @@ public class OrbitalCommand {
         if (shot == null) {
             ctx.getSource().sendError(Text.literal("Unknown shot type: " + shotId));
             return 0;
+        }
+
+        if (size > 32) {
+            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            size = 32;
         }
 
         for (int i = 0; i < amount; i++) {
@@ -174,8 +295,14 @@ public class OrbitalCommand {
             return 0;
         }
 
+        if (size > 32) {
+            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            size = 32;
+        }
+
+        int finalSize = size;
         StrikeScheduler.schedule(delay, () -> {
-            shot.fire(ctx.getSource().getWorld(), pos.toCenterPos(), size);
+            shot.fire(ctx.getSource().getWorld(), pos.toCenterPos(), finalSize);
         });
 
         ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
@@ -221,8 +348,14 @@ public class OrbitalCommand {
             return 0;
         }
 
+        if (size > 32) {
+            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            size = 32;
+        }
+
+        int finalSize = size;
         StrikeScheduler.schedule(delay, () -> {
-            shot.fire(ctx.getSource().getWorld(), hit.getBlockPos().toCenterPos(), size);
+            shot.fire(ctx.getSource().getWorld(), hit.getBlockPos().toCenterPos(), finalSize);
         });
 
         ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
@@ -269,6 +402,11 @@ public class OrbitalCommand {
         if (shot == null) {
             ctx.getSource().sendError(Text.literal("Unknown shot type: " + shotId));
             return 0;
+        }
+
+        if (size > 32) {
+            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            size = 32;
         }
 
         ItemStack rod = new ItemStack(Items.FISHING_ROD, 1);
