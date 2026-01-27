@@ -11,7 +11,7 @@ public class RaycastUtil {
     public static BlockHitResult raycast(PlayerEntity player) {
         Vec3d start = player.getEyePos();
         Vec3d end = start.add(player.getRotationVec(1.0f).multiply(512));
-        HitResult result = player.getWorld().raycast(
+        HitResult result = player.getEntityWorld().raycast(
                 new RaycastContext(
                         start,
                         end,

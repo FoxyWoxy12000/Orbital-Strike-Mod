@@ -23,7 +23,7 @@ public class FishingRodItemMixin {
     private void use(World world, PlayerEntity user, Hand hand, CallbackInfoReturnable<ItemStack> cir) {
         ItemStack stack = user.getStackInHand(hand);
         if (!OrbitalRodUtil.isOrbitalRod(stack)) return;
-        if (world.isClient) return;
+        if (world.isClient()) return;
 
         BlockHitResult hit = RaycastUtil.raycast(user);
         if (hit == null) {
