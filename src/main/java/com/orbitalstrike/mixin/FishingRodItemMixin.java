@@ -1,5 +1,6 @@
 package com.orbitalstrike.mixin;
 
+import com.orbitalstrike.core.command.OrbitalCommand;
 import com.orbitalstrike.core.rod.OrbitalRodUtil;
 import com.orbitalstrike.core.rod.RodTriggerStyle;
 import com.orbitalstrike.core.shot.OrbitalShot;
@@ -92,13 +93,23 @@ public class FishingRodItemMixin {
     private void handleInstant(ServerPlayerEntity player, ServerWorld world, ItemStack stack, OrbitalShot shot, int delay, int size, BlockPos fixedPos) {
         if (fixedPos != null) {
             StrikeScheduler.schedule(delay, () -> shot.fire(world, fixedPos.toCenterPos(), size));
+            world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            breakRod(player, stack);
         } else {
             BlockHitResult hit = RaycastUtil.raycast(player);
-            if (hit == null) return;
+            if (hit == null) {
+                if (OrbitalCommand.MISS_FAILSAFE) {
+                    return;
+                } else {
+                    world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                    breakRod(player, stack);
+                    return;
+                }
+            }
             StrikeScheduler.schedule(delay, () -> shot.fire(world, hit.getBlockPos().toCenterPos(), size));
+            world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+            breakRod(player, stack);
         }
-        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-        stack.decrement(1);
     }
 
     @Unique
@@ -117,17 +128,25 @@ public class FishingRodItemMixin {
 
             if (fixedPos != null) {
                 StrikeScheduler.schedule(delay, () -> shot.fire(world, fixedPos.toCenterPos(), size));
+                world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                breakRod(player, stack);
             } else {
                 BlockHitResult hit = RaycastUtil.raycast(player);
-                if (hit == null) return;
+                if (hit == null) {
+                    if (OrbitalCommand.MISS_FAILSAFE) {
+                        return;
+                    } else {
+                        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                        breakRod(player, stack);
+                        return;
+                    }
+                }
                 StrikeScheduler.schedule(delay, () -> shot.fire(world, hit.getBlockPos().toCenterPos(), size));
+                world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                breakRod(player, stack);
             }
-
-            world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-            stack.decrement(1);
         });
     }
-
 
     @Unique
     private void handleReel(ServerPlayerEntity player, ServerWorld world, ItemStack stack, OrbitalShot shot, int delay, int size, BlockPos fixedPos) {
@@ -144,13 +163,31 @@ public class FishingRodItemMixin {
 
             if (fixedPos != null) {
                 StrikeScheduler.schedule(delay, () -> shot.fire(world, fixedPos.toCenterPos(), size));
+                world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                breakRod(player, stack);
             } else {
                 BlockHitResult hit = RaycastUtil.raycast(player);
-                if (hit == null) return;
+                if (hit == null) {
+                    if (OrbitalCommand.MISS_FAILSAFE) {
+                        return;
+                    } else {
+                        world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                        breakRod(player, stack);
+                        return;
+                    }
+                }
                 StrikeScheduler.schedule(delay, () -> shot.fire(world, hit.getBlockPos().toCenterPos(), size));
+                world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+                breakRod(player, stack);
             }
-            world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-            stack.decrement(1);
         }
+    }
+
+    @Unique
+    private void breakRod(ServerPlayerEntity player, ItemStack stack) {
+        if (player.isCreative() && !OrbitalCommand.ONE_USE_CREATIVE) {
+            return;
+        }
+        stack.decrement(1);
     }
 }

@@ -4,6 +4,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.orbitalstrike.core.rod.OrbitalRodUtil;
 import com.orbitalstrike.core.rod.RodTriggerStyle;
@@ -17,6 +18,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.command.CommandManager;
@@ -27,6 +29,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 
 public class OrbitalCommand {
+
+    public static boolean ORBITAL_CHAT_ANNOUNCEMENT = false;
+    public static boolean ADVANCED_ROD_NAMES = false;
+    public static boolean MISS_FAILSAFE = true;
+    public static boolean ONE_USE_CREATIVE = true;
 
     private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
             CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
@@ -112,6 +119,45 @@ public class OrbitalCommand {
                             )
 
                             .then(CommandManager.literal("setting")
+                                    .then(CommandManager.literal("gamerule")
+                                            .then(CommandManager.literal("OrbitalChatAnnouncement")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                ORBITAL_CHAT_ANNOUNCEMENT = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Orbital chat announcement set to " + ORBITAL_CHAT_ANNOUNCEMENT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("AdvancedRodNames")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                ADVANCED_ROD_NAMES = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Advanced rod names set to " + ADVANCED_ROD_NAMES), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("MissFailsafe")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                MISS_FAILSAFE = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Miss failsafe set to " + MISS_FAILSAFE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("OneUseCreative")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                ONE_USE_CREATIVE = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("One use creative set to " + ONE_USE_CREATIVE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                    )
+
                                     .then(CommandManager.literal("triggerstyle")
                                             .then(CommandManager.argument("style", StringArgumentType.word())
                                                     .suggests(TRIGGER_STYLE_SUGGESTIONS)
@@ -243,7 +289,9 @@ public class OrbitalCommand {
         }
 
         if (size > 32) {
-            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            if (ORBITAL_CHAT_ANNOUNCEMENT) {
+                ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            }
             size = 32;
         }
 
@@ -251,10 +299,22 @@ public class OrbitalCommand {
             ItemStack rod = new ItemStack(Items.FISHING_ROD, 1);
             rod.setDamage(rod.getMaxDamage() - 1);
             OrbitalRodUtil.tag(rod, shotId, delay, size, null, player.getUuidAsString());
+
+            if (ADVANCED_ROD_NAMES) {
+                rod.set(DataComponentTypes.CUSTOM_NAME,
+                        Text.literal(shotId + " " + delay + " " + size).styled(style -> style.withItalic(true)));
+            } else {
+                rod.set(DataComponentTypes.CUSTOM_NAME,
+                        Text.literal(shotId + " shot").styled(style -> style.withItalic(true)));
+            }
+
             player.giveItemStack(rod);
         }
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Gave " + amount + "x " + shotId + " orbital rod(s)"), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            int finalAmount = amount;
+            ctx.getSource().sendFeedback(() -> Text.literal("Gave " + finalAmount + "x " + shotId + " orbital rod(s)"), false);
+        }
         return 1;
     }
 
@@ -276,10 +336,22 @@ public class OrbitalCommand {
             ItemStack rod = new ItemStack(Items.FISHING_ROD, 1);
             rod.setDamage(rod.getMaxDamage() - 1);
             OrbitalRodUtil.tag(rod, shotId, delay, 0, null, player.getUuidAsString());
+
+            if (ADVANCED_ROD_NAMES) {
+                rod.set(DataComponentTypes.CUSTOM_NAME,
+                        Text.literal(shotId + " " + delay + " 0").styled(style -> style.withItalic(true)));
+            } else {
+                rod.set(DataComponentTypes.CUSTOM_NAME,
+                        Text.literal(shotId + " shot").styled(style -> style.withItalic(true)));
+            }
+
             player.giveItemStack(rod);
         }
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Gave " + amount + "x " + shotId + " orbital rod(s)"), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            int finalAmount = amount;
+            ctx.getSource().sendFeedback(() -> Text.literal("Gave " + finalAmount + "x " + shotId + " orbital rod(s)"), false);
+        }
         return 1;
     }
 
@@ -296,7 +368,9 @@ public class OrbitalCommand {
         }
 
         if (size > 32) {
-            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            if (ORBITAL_CHAT_ANNOUNCEMENT) {
+                ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            }
             size = 32;
         }
 
@@ -305,7 +379,9 @@ public class OrbitalCommand {
             shot.fire(ctx.getSource().getWorld(), pos.toCenterPos(), finalSize);
         });
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        }
         return 1;
     }
 
@@ -324,7 +400,9 @@ public class OrbitalCommand {
             shot.fire(ctx.getSource().getWorld(), pos.toCenterPos(), 0);
         });
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        }
         return 1;
     }
 
@@ -349,7 +427,9 @@ public class OrbitalCommand {
         }
 
         if (size > 32) {
-            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            if (ORBITAL_CHAT_ANNOUNCEMENT) {
+                ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            }
             size = 32;
         }
 
@@ -358,7 +438,9 @@ public class OrbitalCommand {
             shot.fire(ctx.getSource().getWorld(), hit.getBlockPos().toCenterPos(), finalSize);
         });
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        }
         return 1;
     }
 
@@ -385,7 +467,9 @@ public class OrbitalCommand {
             shot.fire(ctx.getSource().getWorld(), hit.getBlockPos().toCenterPos(), 0);
         });
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            ctx.getSource().sendFeedback(() -> Text.literal("Orbital strike incoming..."), false);
+        }
         return 1;
     }
 
@@ -405,16 +489,29 @@ public class OrbitalCommand {
         }
 
         if (size > 32) {
-            ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            if (ORBITAL_CHAT_ANNOUNCEMENT) {
+                ctx.getSource().sendError(Text.literal("Warning: Size capped at 32 to prevent server issues"));
+            }
             size = 32;
         }
 
         ItemStack rod = new ItemStack(Items.FISHING_ROD, 1);
         rod.setDamage(rod.getMaxDamage() - 1);
         OrbitalRodUtil.tag(rod, shotId, delay, size, pos, player.getUuidAsString());
+
+        if (ADVANCED_ROD_NAMES) {
+            rod.set(DataComponentTypes.CUSTOM_NAME,
+                    Text.literal(shotId + " " + delay + " " + size + " " + pos.toShortString()).styled(style -> style.withItalic(true)));
+        } else {
+            rod.set(DataComponentTypes.CUSTOM_NAME,
+                    Text.literal(shotId + " shot").styled(style -> style.withItalic(true)));
+        }
+
         player.giveItemStack(rod);
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Gave fixed-target " + shotId + " orbital rod"), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            ctx.getSource().sendFeedback(() -> Text.literal("Gave fixed-target " + shotId + " orbital rod"), false);
+        }
         return 1;
     }
 
@@ -435,9 +532,20 @@ public class OrbitalCommand {
         ItemStack rod = new ItemStack(Items.FISHING_ROD, 1);
         rod.setDamage(rod.getMaxDamage() - 1);
         OrbitalRodUtil.tag(rod, shotId, delay, 0, pos, player.getUuidAsString());
+
+        if (ADVANCED_ROD_NAMES) {
+            rod.set(DataComponentTypes.CUSTOM_NAME,
+                    Text.literal(shotId + " " + delay + " 0 " + pos.toShortString()).styled(style -> style.withItalic(true)));
+        } else {
+            rod.set(DataComponentTypes.CUSTOM_NAME,
+                    Text.literal(shotId + " shot").styled(style -> style.withItalic(true)));
+        }
+
         player.giveItemStack(rod);
 
-        ctx.getSource().sendFeedback(() -> Text.literal("Gave fixed-target " + shotId + " orbital rod"), false);
+        if (ORBITAL_CHAT_ANNOUNCEMENT) {
+            ctx.getSource().sendFeedback(() -> Text.literal("Gave fixed-target " + shotId + " orbital rod"), false);
+        }
         return 1;
     }
 

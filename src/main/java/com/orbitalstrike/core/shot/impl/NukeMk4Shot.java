@@ -12,9 +12,9 @@ public class NukeMk4Shot implements OrbitalShot {
     private static final Random RANDOM = new Random();
 
     public static int OFFSET_HEIGHT = 100;
-    public static double INNER_RING_MULTIPLIER = 16.0;
-    public static double OUTER_RING_MULTIPLIER = 2.0;
-    public static double IMPERFECTION_PERCENT = 0.20;
+    public static double INNER_RING_MULTIPLIER = 14.0;
+    public static double OUTER_RING_MULTIPLIER = 3.0;
+    public static double IMPERFECTION_PERCENT = 0.25;
 
     @Override
     public String id() {
