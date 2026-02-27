@@ -158,7 +158,9 @@ public class FishingRodItemMixin {
             world.spawnEntity(bobber);
             CAST_STATE.put(playerId, true);
         } else {
-            player.fishHook.discard();
+            if (player.fishHook != null && player.fishHook.isAlive()) {
+                player.fishHook.discard();
+            }
             CAST_STATE.remove(playerId);
 
             if (fixedPos != null) {
@@ -189,5 +191,6 @@ public class FishingRodItemMixin {
             return;
         }
         stack.decrement(1);
+        CAST_STATE.remove(player.getUuid());
     }
 }

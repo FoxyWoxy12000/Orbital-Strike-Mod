@@ -12,15 +12,15 @@ import java.util.UUID;
 
 public class NukeMk4Shot implements OrbitalShot {
 
-    public static int OFFSET_HEIGHT = 70; //can be set to 1) 100 or 2) 70
+    public static int OFFSET_HEIGHT = 70;
     public static double INNER_RING_MULTIPLIER = 70.0;
     public static double OUTER_RING_MULTIPLIER = 0.15;
     public static double IMPERFECTION_PERCENT = 0.0;
-    public static int TNT_FUSE = 80; // can be set to 1) 110 or 2) 80
+    public static int TNT_FUSE = 80;
 
     @Override
     public String id() {
-        return "nukeMk4";
+        return "nukemk4";
     }
 
     @Override

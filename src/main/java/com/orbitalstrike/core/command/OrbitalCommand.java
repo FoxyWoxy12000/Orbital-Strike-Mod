@@ -37,6 +37,13 @@ public class OrbitalCommand {
     public static boolean MISS_FAILSAFE = true;
     public static boolean ONE_USE_CREATIVE = true;
 
+    private static String getNukeDisplayName(String shotId) {
+        if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")) {
+            return "nuke";
+        }
+        return shotId;
+    }
+
     private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
             CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
 
@@ -302,12 +309,13 @@ public class OrbitalCommand {
             rod.setDamage(rod.getMaxDamage() - 1);
             OrbitalRodUtil.tag(rod, shotId, delay, size, null, player.getUuidAsString());
 
+            String displayName = getNukeDisplayName(shotId);
             if (ADVANCED_ROD_NAMES) {
                 rod.set(DataComponentTypes.CUSTOM_NAME,
                         Text.literal(shotId + " " + delay + " " + size).styled(style -> style.withItalic(true)));
             } else {
                 rod.set(DataComponentTypes.CUSTOM_NAME,
-                        Text.literal(shotId + " shot").styled(style -> style.withItalic(true)));
+                        Text.literal(displayName + " shot").styled(style -> style.withItalic(true)));
             }
 
             player.giveItemStack(rod);

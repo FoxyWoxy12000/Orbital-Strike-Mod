@@ -20,7 +20,7 @@ public class NukeMk6Shot implements OrbitalShot {
 
     @Override
     public String id() {
-        return "nukeMk6";
+        return "nukemk6";
     }
 
     @Override
