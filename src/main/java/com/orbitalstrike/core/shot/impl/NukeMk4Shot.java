@@ -1,24 +1,26 @@
 package com.orbitalstrike.core.shot.impl;
 
 import com.orbitalstrike.core.shot.OrbitalShot;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class NukeMk4Shot implements OrbitalShot {
 
-    private static final Random RANDOM = new Random();
-
-    public static int OFFSET_HEIGHT = 100;
-    public static double INNER_RING_MULTIPLIER = 14.0;
-    public static double OUTER_RING_MULTIPLIER = 3.0;
-    public static double IMPERFECTION_PERCENT = 0.25;
+    public static int OFFSET_HEIGHT = 70; //can be set to 1) 100 or 2) 70
+    public static double INNER_RING_MULTIPLIER = 70.0;
+    public static double OUTER_RING_MULTIPLIER = 0.15;
+    public static double IMPERFECTION_PERCENT = 0.0;
+    public static int TNT_FUSE = 80; // can be set to 1) 110 or 2) 80
 
     @Override
     public String id() {
-        return "nuke";
+        return "nukeMk4";
     }
 
     @Override
@@ -28,32 +30,53 @@ public class NukeMk4Shot implements OrbitalShot {
         }
 
         double spawnY = pos.y + OFFSET_HEIGHT;
+        Map<UUID, Vec3d> delayedVectors = new HashMap<>();
 
-        TntEntity center = new TntEntity(world, pos.x, spawnY, pos.z, null);
-        center.setFuse(110);
-        center.setVelocity(0, -0.5, 0);
-        world.spawnEntity(center);
+        for (int i = 0; i < 5; i++) {
+            TntEntity tnt = new TntEntity(world, pos.x, spawnY, pos.z, null);
+            tnt.setFuse(TNT_FUSE);
+            world.spawnEntity(tnt);
+            delayedVectors.put(tnt.getUuid(), new Vec3d(0.0, 0.0, 0.0));
+        }
 
-        int rings = size;
-        for (int ring = 1; ring <= rings; ring++) {
-            double targetRadius = ring * OUTER_RING_MULTIPLIER;
-            int tntInThisRing = (int)(INNER_RING_MULTIPLIER * ring);
+        int totalRings = Math.max(size, 1);
+        double baseSpeed = 0.025;
 
-            for (int i = 0; i < tntInThisRing; i++) {
-                if (RANDOM.nextDouble() < IMPERFECTION_PERCENT) continue;
+        for (int ring = 1; ring <= totalRings; ring++) {
+            double ringSpeed = baseSpeed + ring * OUTER_RING_MULTIPLIER;
+            int tntCount = (int)(INNER_RING_MULTIPLIER + (ring - 1) * 1);
 
-                double angle = (2 * Math.PI * i) / tntInThisRing;
+            for (int i = 0; i < tntCount; i++) {
+                if (world.random.nextDouble() < IMPERFECTION_PERCENT) continue;
 
-                double offsetX = Math.cos(angle) * 0.3;
-                double offsetZ = Math.sin(angle) * 0.3;
+                double angle = world.random.nextDouble() * Math.PI * 2.0;
+                double vX = Math.cos(angle) * ringSpeed;
+                double vZ = Math.sin(angle) * ringSpeed;
 
-                double velocityX = Math.cos(angle) * (targetRadius / 25.0);
-                double velocityZ = Math.sin(angle) * (targetRadius / 25.0);
-
-                TntEntity tnt = new TntEntity(world, pos.x + offsetX, spawnY, pos.z + offsetZ, null);
-                tnt.setFuse(110);
-                tnt.setVelocity(velocityX, -0.5, velocityZ);
+                TntEntity tnt = new TntEntity(world, pos.x, spawnY, pos.z, null);
+                tnt.setFuse(TNT_FUSE);
                 world.spawnEntity(tnt);
+                delayedVectors.put(tnt.getUuid(), new Vec3d(vX, 0.0, vZ));
+            }
+        }
+
+        world.getServer().execute(() -> {
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            applyVectors(world, delayedVectors);
+        });
+    }
+
+    private void applyVectors(ServerWorld world, Map<UUID, Vec3d> delayedVectors) {
+        for (Map.Entry<UUID, Vec3d> entry : delayedVectors.entrySet()) {
+            Entity entity = world.getEntity(entry.getKey());
+            if (entity instanceof TntEntity) {
+                TntEntity tnt = (TntEntity) entity;
+                Vec3d velocity = entry.getValue();
+                tnt.setVelocity(velocity.x, -0.5, velocity.z);
             }
         }
     }
