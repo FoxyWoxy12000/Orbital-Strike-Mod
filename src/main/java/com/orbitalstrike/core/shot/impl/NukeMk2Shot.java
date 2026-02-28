@@ -37,6 +37,8 @@ public class NukeMk2Shot implements OrbitalShot {
         int coneCutoff = totalRings / 2;
         double currentRingSpeed = RING_BASE_SPEED;
 
+
+
         for (int r = 1; r <= totalRings; r++) {
             boolean inCone = r <= coneCutoff;
             currentRingSpeed += inCone ? RING_SPEED_STEP_CONE : RING_SPEED_STEP_OUTER;
@@ -56,7 +58,7 @@ public class NukeMk2Shot implements OrbitalShot {
         }
 
         Map<UUID, Vec3d> batch2Vectors = new HashMap<>();
-        int batch2Rings = (int)(totalRings * 1.75);
+        int batch2Rings = (int)(totalRings);
         double startVY = -7.0;
         double endVY = -7.5;
 
