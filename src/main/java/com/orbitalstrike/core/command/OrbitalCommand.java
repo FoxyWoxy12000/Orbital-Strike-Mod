@@ -11,10 +11,7 @@ import com.orbitalstrike.core.rod.RodTriggerStyle;
 import com.orbitalstrike.core.shot.OrbitalShot;
 import com.orbitalstrike.core.shot.ShotRegistry;
 import com.orbitalstrike.core.rod.RodNameUpdater;
-import com.orbitalstrike.core.shot.impl.NukeMk2Shot;
-import com.orbitalstrike.core.shot.impl.NukeMk4Shot;
-import com.orbitalstrike.core.shot.impl.NukeMk6Shot;
-import com.orbitalstrike.core.shot.impl.StabShot;
+import com.orbitalstrike.core.shot.impl.*;
 import com.orbitalstrike.core.util.RaycastUtil;
 import com.orbitalstrike.core.util.StrikeScheduler;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -61,6 +58,12 @@ public class OrbitalCommand {
     private static String getNukeDisplayName(String shotId) {
         if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")) {
             return "nuke";
+        }
+        return shotId;
+    }
+    private static String getStabDisplayName(String shotId) {
+        if (shotId.equals("stab") || shotId.equals("StraightStab")) {
+            return "stab";
         }
         return shotId;
     }
