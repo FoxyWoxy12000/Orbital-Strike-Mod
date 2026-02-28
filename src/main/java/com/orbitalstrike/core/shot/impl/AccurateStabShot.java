@@ -1,4 +1,4 @@
 package com.orbitalstrike.core.shot.impl;
 
-public class AccurateStab {
+public class AccurateStabShot {
 }

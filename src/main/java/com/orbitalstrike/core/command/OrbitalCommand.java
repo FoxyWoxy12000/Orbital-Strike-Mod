@@ -1,6 +1,9 @@
 package com.orbitalstrike.core.command;
 
 import com.mojang.brigadier.context.CommandContext;
+import com.orbitalstrike.core.shot.impl.SquareStabShot;
+import com.orbitalstrike.core.shot.impl.CircleStabShot;
+import com.orbitalstrike.core.shot.impl.StarStabShot;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -36,6 +39,10 @@ public class OrbitalCommand {
     public static boolean ONE_USE_CREATIVE = true;
     public static boolean FANCY_RODS = false;
     public static boolean MK2_CLOUD_ONLY = false;
+    public static boolean STRAIGHT_STAB_SHOT = false;
+    public static boolean STRAIGHT_CIRCLE_STAB_SHOT = false;
+    public static boolean STRAIGHT_SQUARE_STAB_SHOT = false;
+    public static boolean STRAIGHT_STAR_STAB_SHOT = false;
 
     private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
             CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
@@ -196,6 +203,33 @@ public class OrbitalCommand {
                                                             })
                                                     )
                                             )
+                                            .then(CommandManager.literal("StraightStabShot")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                STRAIGHT_STAB_SHOT = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Straight Stab Shot set to " + STRAIGHT_STAB_SHOT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("STRAIGHT_CIRCLE_STAB_SHOT")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                STRAIGHT_CIRCLE_STAB_SHOT = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("STRAIGHT_CIRCLE_STAB_SHOT set to " + STRAIGHT_CIRCLE_STAB_SHOT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("STRAIGHT_SQUARE_STAB_SHOT")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                STRAIGHT_SQUARE_STAB_SHOT = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("STRAIGHT_SQUARE_STAB_SHOT set to " + STRAIGHT_SQUARE_STAB_SHOT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
                                     )
 
                                     .then(CommandManager.literal("triggerstyle")
@@ -329,6 +363,212 @@ public class OrbitalCommand {
                                                             .executes(ctx -> {
                                                                 StabShot.AMOUNT_PER_PIECE = IntegerArgumentType.getInteger(ctx, "value");
                                                                 ctx.getSource().sendFeedback(() -> Text.literal("Stab amount per piece set to " + StabShot.AMOUNT_PER_PIECE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                    )
+                                    .then(CommandManager.literal("squarestab")
+                                            .then(CommandManager.literal("VERTICAL_DEPTH")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                SquareStabShot.VERTICAL_DEPTH = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("SquareStab vertical depth set to " + SquareStabShot.VERTICAL_DEPTH), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("OFFSET")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                SquareStabShot.OFFSET = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("SquareStab offset set to " + SquareStabShot.OFFSET), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("AMOUNT_PER_PIECE")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                SquareStabShot.AMOUNT_PER_PIECE = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("SquareStab amount per piece set to " + SquareStabShot.AMOUNT_PER_PIECE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("SPACING")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                SquareStabShot.SPACING = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("SquareStab spacing set to " + SquareStabShot.SPACING), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("START_Y")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(-64, 319))
+                                                            .executes(ctx -> {
+                                                                SquareStabShot.START_Y = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("SquareStab start Y set to " + SquareStabShot.START_Y), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("END_Y")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(-64, 319))
+                                                            .executes(ctx -> {
+                                                                SquareStabShot.END_Y = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("SquareStab end Y set to " + SquareStabShot.END_Y), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("circlestab")
+                                            .then(CommandManager.literal("VERTICAL_DEPTH")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                CircleStabShot.VERTICAL_DEPTH = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("CircleStab vertical depth set to " + CircleStabShot.VERTICAL_DEPTH), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("OFFSET")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                CircleStabShot.OFFSET = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("CircleStab offset set to " + CircleStabShot.OFFSET), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("AMOUNT_PER_PIECE")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                CircleStabShot.AMOUNT_PER_PIECE = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("CircleStab amount per piece set to " + CircleStabShot.AMOUNT_PER_PIECE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("DENSITY")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                CircleStabShot.DENSITY = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("CircleStab density set to " + CircleStabShot.DENSITY), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("RADIUS_PER_SIZE")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                CircleStabShot.RADIUS_PER_SIZE = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("CircleStab radius per size set to " + CircleStabShot.RADIUS_PER_SIZE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("START_Y")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(-64, 319))
+                                                            .executes(ctx -> {
+                                                                CircleStabShot.START_Y = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("CircleStab start Y set to " + CircleStabShot.START_Y), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("END_Y")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(-64, 319))
+                                                            .executes(ctx -> {
+                                                                CircleStabShot.END_Y = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("CircleStab end Y set to " + CircleStabShot.END_Y), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                    )
+
+                                    .then(CommandManager.literal("starstab")
+                                            .then(CommandManager.literal("VERTICAL_DEPTH")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.VERTICAL_DEPTH = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab vertical depth set to " + StarStabShot.VERTICAL_DEPTH), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("OFFSET")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.OFFSET = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab offset set to " + StarStabShot.OFFSET), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("AMOUNT_PER_PIECE")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.AMOUNT_PER_PIECE = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab amount per piece set to " + StarStabShot.AMOUNT_PER_PIECE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("DENSITY")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.DENSITY = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab density set to " + StarStabShot.DENSITY), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("OUTER_RADIUS_PER_SIZE")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.OUTER_RADIUS_PER_SIZE = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab outer radius per size set to " + StarStabShot.OUTER_RADIUS_PER_SIZE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("INNER_RADIUS_PER_SIZE")
+                                                    .then(CommandManager.argument("value", DoubleArgumentType.doubleArg(0.0))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.INNER_RADIUS_PER_SIZE = DoubleArgumentType.getDouble(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab inner radius per size set to " + StarStabShot.INNER_RADIUS_PER_SIZE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("STAR_POINTS")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(3, 20))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.STAR_POINTS = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab points set to " + StarStabShot.STAR_POINTS), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("START_Y")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(-64, 319))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.START_Y = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab start Y set to " + StarStabShot.START_Y), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("END_Y")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(-64, 319))
+                                                            .executes(ctx -> {
+                                                                StarStabShot.END_Y = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("StarStab end Y set to " + StarStabShot.END_Y), false);
                                                                 return 1;
                                                             })
                                                     )

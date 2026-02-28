@@ -4,20 +4,23 @@ import com.orbitalstrike.core.shot.OrbitalShot;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
+import com.orbitalstrike.core.command.OrbitalCommand;
 
 import java.util.Random;
 
-public class StarStab implements OrbitalShot {
+public class StarStabShot implements OrbitalShot {
 
     private static final Random RANDOM = new Random();
 
-    public static int DEPTH = 3;
+    public static int VERTICAL_DEPTH = 3;
     public static double OFFSET = 0.5;
     public static int AMOUNT_PER_PIECE = 3;
     public static double DENSITY = 4.0;
-    public static double MAX_OUTER = 30.0;
-    public static double MAX_INNER = 12.0;
+    public static double OUTER_RADIUS_PER_SIZE = 6.0;
+    public static double INNER_RADIUS_PER_SIZE = 2.4;
     public static int STAR_POINTS = 5;
+    public static int START_Y = 319;
+    public static int END_Y = -64;
 
     @Override
     public String id() {
@@ -26,14 +29,26 @@ public class StarStab implements OrbitalShot {
 
     @Override
     public void fire(ServerWorld world, Vec3d pos, int size) {
+        if (OrbitalCommand.STRAIGHT_STAR_STAB_SHOT) {
+            AMOUNT_PER_PIECE = 1;
+            VERTICAL_DEPTH = 1;
+                    OFFSET = 0;
+        } else {
+            AMOUNT_PER_PIECE = 3;
+            VERTICAL_DEPTH = 3;
+            OFFSET = 0.5;
+        }
+        double maxOuter = Math.max(size, 1) * OUTER_RADIUS_PER_SIZE;
+        double maxInner = Math.max(size, 1) * INNER_RADIUS_PER_SIZE;
+
         fireVerticalColumn(world, pos.x, pos.z);
 
-        int layers = (int)(MAX_OUTER / DENSITY);
+        int layers = (int)(maxOuter / DENSITY);
 
         for (int l = 1; l <= layers; l++) {
             double scale = (double)l / layers;
-            double currentOuter = MAX_OUTER * scale;
-            double currentInner = MAX_INNER * scale;
+            double currentOuter = maxOuter * scale;
+            double currentInner = maxInner * scale;
 
             for (int i = 0; i < STAR_POINTS; i++) {
                 double angleOuter = (Math.PI / 2) + (Math.PI * 2) * i / STAR_POINTS;
@@ -79,7 +94,7 @@ public class StarStab implements OrbitalShot {
     }
 
     private void fireVerticalColumn(ServerWorld world, double x, double z) {
-        for (int y = 319; y >= -64; y -= DEPTH) {
+        for (int y = START_Y; y >= END_Y; y -= VERTICAL_DEPTH) {
             for (int i = 0; i < AMOUNT_PER_PIECE; i++) {
                 double offsetX = (RANDOM.nextDouble() - 0.5) * OFFSET;
                 double offsetZ = (RANDOM.nextDouble() - 0.5) * OFFSET;
