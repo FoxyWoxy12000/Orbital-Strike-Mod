@@ -12,7 +12,6 @@ import java.util.UUID;
 
 public class NukeMk2Shot implements OrbitalShot {
 
-    public static int OFFSET_HEIGHT = 150;
     public static double RING_BASE_SPEED = 0.025;
     public static double RING_SPEED_STEP_CONE = 0.1;
     public static double RING_SPEED_STEP_OUTER = 0.225;
@@ -20,6 +19,7 @@ public class NukeMk2Shot implements OrbitalShot {
     public static double BATCH2_SPEED_STEP = 0.35;
     public static double CONE_BASE_DOWN_SPEED = 0.4;
     public static double CONE_DOWN_STEP = 0.35;
+    public static int TNT_FUSE = 80;
 
     @Override
     public String id() {
@@ -32,12 +32,12 @@ public class NukeMk2Shot implements OrbitalShot {
             size = 32;
         }
 
-        double spawnY = pos.y + OFFSET_HEIGHT;
         int totalRings = Math.max(size, 1);
+        double coneHeight = 150 + (size - 10) * 12.5;
+        double spawnY = pos.y + coneHeight;
+
         int coneCutoff = totalRings / 2;
         double currentRingSpeed = RING_BASE_SPEED;
-
-
 
         for (int r = 1; r <= totalRings; r++) {
             boolean inCone = r <= coneCutoff;
@@ -51,7 +51,7 @@ public class NukeMk2Shot implements OrbitalShot {
                 double vZ = Math.sin(angle) * currentRingSpeed;
 
                 TntEntity tnt = new TntEntity(world, pos.x, spawnY, pos.z, null);
-                tnt.setFuse(80);
+                tnt.setFuse(TNT_FUSE);
                 tnt.setVelocity(vX, b1Vert, vZ);
                 world.spawnEntity(tnt);
             }
@@ -61,6 +61,7 @@ public class NukeMk2Shot implements OrbitalShot {
         int batch2Rings = (int)(totalRings);
         double startVY = -7.0;
         double endVY = -7.5;
+        double batch2SpawnY = pos.y + 150;
 
         for (int r = 1; r <= batch2Rings; r++) {
             double progress = (double)r / batch2Rings;
@@ -73,8 +74,8 @@ public class NukeMk2Shot implements OrbitalShot {
                 double vX = Math.cos(angle) * speed;
                 double vZ = Math.sin(angle) * speed;
 
-                TntEntity tnt = new TntEntity(world, pos.x, spawnY, pos.z, null);
-                tnt.setFuse(80);
+                TntEntity tnt = new TntEntity(world, pos.x, batch2SpawnY, pos.z, null);
+                tnt.setFuse(TNT_FUSE);
                 world.spawnEntity(tnt);
                 batch2Vectors.put(tnt.getUuid(), new Vec3d(vX, currentVY, vZ));
             }
@@ -82,7 +83,7 @@ public class NukeMk2Shot implements OrbitalShot {
 
         world.getServer().execute(() -> {
             try {
-                Thread.sleep(3000);
+                Thread.sleep(TNT_FUSE * 50 - 1500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
