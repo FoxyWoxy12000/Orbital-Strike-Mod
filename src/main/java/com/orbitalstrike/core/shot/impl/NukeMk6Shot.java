@@ -1,5 +1,6 @@
 package com.orbitalstrike.core.shot.impl;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.orbitalstrike.core.shot.OrbitalShot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.TntEntity;
@@ -12,11 +13,12 @@ import java.util.UUID;
 
 public class NukeMk6Shot implements OrbitalShot {
 
-    public static int OFFSET_HEIGHT = 140;
+    public static int OFFSET_HEIGHT = 150;
     public static double BASE_SPEED = 0.15;
     public static double SPEED_STEP = 0.5;
     public static double START_VY = -7.0;
     public static double END_VY = -7.75;
+    public static int TNT_FUSE = 60;
 
     @Override
     public String id() {
@@ -45,7 +47,7 @@ public class NukeMk6Shot implements OrbitalShot {
                 double vZ = Math.sin(angle) * ringSpeed;
 
                 TntEntity tnt = new TntEntity(world, pos.x, spawnY, pos.z, null);
-                tnt.setFuse(80);
+                tnt.setFuse(TNT_FUSE);
                 world.spawnEntity(tnt);
                 vectors.put(tnt.getUuid(), new Vec3d(vX, vY, vZ));
             }
@@ -53,7 +55,7 @@ public class NukeMk6Shot implements OrbitalShot {
 
         world.getServer().execute(() -> {
             try {
-                Thread.sleep(150);
+                Thread.sleep(1500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

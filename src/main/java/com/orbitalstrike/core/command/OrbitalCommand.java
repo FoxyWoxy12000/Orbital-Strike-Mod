@@ -1,5 +1,6 @@
 package com.orbitalstrike.core.command;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -43,6 +44,8 @@ public class OrbitalCommand {
         }
         return shotId;
     }
+    private static final SuggestionProvider<ServerCommandSource> SIZE_SUGGESTIONS = (context, builder) ->
+            CommandSource.suggestMatching(new String[]{"silly", "stinky", "garbage"}, builder);
 
     private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
             CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
