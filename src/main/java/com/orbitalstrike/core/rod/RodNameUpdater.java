@@ -15,7 +15,7 @@ public class RodNameUpdater {
         int delay = OrbitalRodUtil.getDelay(rod);
         int size = OrbitalRodUtil.getSize(rod);
 
-        String displayName = getNukeDisplayName(shotId);
+        String displayName = getShotDisplayName(shotId);
         Text rodName;
 
         if (OrbitalCommand.ADVANCED_ROD_NAMES) {
@@ -34,9 +34,13 @@ public class RodNameUpdater {
         rod.set(DataComponentTypes.CUSTOM_NAME, rodName);
     }
 
-    private static String getNukeDisplayName(String shotId) {
+    private static String getShotDisplayName(String shotId) {
         if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")) {
             return "nuke";
+        }
+        if (shotId.equals("stab") || shotId.equals("straightstab") || shotId.equals("accuratestab") ||
+                shotId.equals("squarestab") || shotId.equals("circlestab") || shotId.equals("starstab")) {
+            return "stab";
         }
         return shotId;
     }

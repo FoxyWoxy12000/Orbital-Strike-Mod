@@ -55,14 +55,12 @@ public class OrbitalCommand {
         return builder.buildFuture();
     };
 
-    private static String getNukeDisplayName(String shotId) {
+    private static String getShotDisplayName(String shotId) {
         if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")) {
             return "nuke";
         }
-        return shotId;
-    }
-    private static String getStabDisplayName(String shotId) {
-        if (shotId.equals("stab") || shotId.equals("StraightStab")) {
+        if (shotId.equals("stab") || shotId.equals("straightstab") || shotId.equals("accuratestab") ||
+                shotId.equals("squarestab") || shotId.equals("circlestab") || shotId.equals("starstab")) {
             return "stab";
         }
         return shotId;
@@ -385,7 +383,7 @@ public class OrbitalCommand {
             rod.setDamage(rod.getMaxDamage() - 1);
             OrbitalRodUtil.tag(rod, shotId, delay, size, null, player.getUuidAsString());
 
-            String displayName = getNukeDisplayName(shotId);
+            String displayName = getShotDisplayName(shotId);
             Text rodName;
 
             if (ADVANCED_ROD_NAMES) {
@@ -429,7 +427,7 @@ public class OrbitalCommand {
             rod.setDamage(rod.getMaxDamage() - 1);
             OrbitalRodUtil.tag(rod, shotId, delay, 0, null, player.getUuidAsString());
 
-            String displayName = getNukeDisplayName(shotId);
+            String displayName = getShotDisplayName(shotId);
             Text rodName;
 
             if (ADVANCED_ROD_NAMES) {
@@ -599,7 +597,7 @@ public class OrbitalCommand {
         rod.setDamage(rod.getMaxDamage() - 1);
         OrbitalRodUtil.tag(rod, shotId, delay, size, pos, player.getUuidAsString());
 
-        String displayName = getNukeDisplayName(shotId);
+        String displayName = getShotDisplayName(shotId);
         Text rodName;
 
         if (ADVANCED_ROD_NAMES) {
@@ -641,7 +639,7 @@ public class OrbitalCommand {
         rod.setDamage(rod.getMaxDamage() - 1);
         OrbitalRodUtil.tag(rod, shotId, delay, 0, pos, player.getUuidAsString());
 
-        String displayName = getNukeDisplayName(shotId);
+        String displayName = getShotDisplayName(shotId);
         Text rodName;
 
         if (ADVANCED_ROD_NAMES) {

@@ -6,6 +6,7 @@ import net.minecraft.entity.TntEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import com.orbitalstrike.core.command.OrbitalCommand;
+import com.orbitalstrike.core.util.StrikeScheduler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,14 +86,9 @@ public class NukeMk2Shot implements OrbitalShot {
             }
         }
 
-        world.getServer().execute(() -> {
-            try {
-                Thread.sleep(2500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            applyVectors(world, batch2Vectors);
-        });
+
+            StrikeScheduler.schedule(50, () -> applyVectors(world, batch2Vectors));
+
     }
 
     private double outQuad(double start, double end, double progress) {

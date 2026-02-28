@@ -17,8 +17,11 @@ public class OrbitalStrike implements ModInitializer {
     public void onInitialize() {
         PLATFORM = new FabricPlatform();
 
-        ShotRegistry.register(new StabShot());
         ShotRegistry.register(new StraightStabShot());
+        //ShotRegistry.register(new AccurateStab());
+        ShotRegistry.register(new SquareStab());
+        ShotRegistry.register(new CircleStab());
+        ShotRegistry.register(new StarStab());
         ShotRegistry.register(new NukeMk4Shot());
         ShotRegistry.register(new NukeMk2Shot());
         ShotRegistry.register(new NukeMk6Shot());
