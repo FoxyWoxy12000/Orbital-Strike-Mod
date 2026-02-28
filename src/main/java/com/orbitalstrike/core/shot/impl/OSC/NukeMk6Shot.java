@@ -1,6 +1,5 @@
-package com.orbitalstrike.core.shot.impl;
+package com.orbitalstrike.core.shot.impl.OSC;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.orbitalstrike.core.shot.OrbitalShot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.TntEntity;

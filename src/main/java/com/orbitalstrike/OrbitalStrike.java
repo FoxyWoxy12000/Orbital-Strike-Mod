@@ -2,6 +2,7 @@ package com.orbitalstrike;
 
 import com.orbitalstrike.core.command.OrbitalCommand;
 import com.orbitalstrike.core.shot.ShotRegistry;
+import com.orbitalstrike.core.shot.impl.OSC.*;
 import com.orbitalstrike.core.shot.impl.*;
 import com.orbitalstrike.core.util.StrikeScheduler;
 import com.orbitalstrike.platform.OrbitalPlatform;
@@ -19,6 +20,7 @@ public class OrbitalStrike implements ModInitializer {
 
 
         //ShotRegistry.register(new AccurateStabShot());
+        ShotRegistry.register(new StabShot());
         ShotRegistry.register(new SquareStabShot());
         ShotRegistry.register(new CircleStabShot());
         ShotRegistry.register(new StarStabShot());

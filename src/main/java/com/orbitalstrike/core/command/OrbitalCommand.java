@@ -1,9 +1,7 @@
 package com.orbitalstrike.core.command;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.orbitalstrike.core.shot.impl.SquareStabShot;
-import com.orbitalstrike.core.shot.impl.CircleStabShot;
-import com.orbitalstrike.core.shot.impl.StarStabShot;
+import com.orbitalstrike.core.shot.impl.OSC.*;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -14,7 +12,6 @@ import com.orbitalstrike.core.rod.RodTriggerStyle;
 import com.orbitalstrike.core.shot.OrbitalShot;
 import com.orbitalstrike.core.shot.ShotRegistry;
 import com.orbitalstrike.core.rod.RodNameUpdater;
-import com.orbitalstrike.core.shot.impl.*;
 import com.orbitalstrike.core.util.RaycastUtil;
 import com.orbitalstrike.core.util.StrikeScheduler;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -43,6 +40,7 @@ public class OrbitalCommand {
     public static boolean STRAIGHT_CIRCLE_STAB_SHOT = false;
     public static boolean STRAIGHT_SQUARE_STAB_SHOT = false;
     public static boolean STRAIGHT_STAR_STAB_SHOT = false;
+
 
     private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
             CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
@@ -230,6 +228,15 @@ public class OrbitalCommand {
                                                             })
                                                     )
                                             )
+                                            .then(CommandManager.literal("STRAIGHT_STAR_STAB_SHOT")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                STRAIGHT_STAR_STAB_SHOT = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("STRAIGHT_STAR_STAB_SHOT set to " + STRAIGHT_STAR_STAB_SHOT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
                                     )
 
                                     .then(CommandManager.literal("triggerstyle")
@@ -246,6 +253,38 @@ public class OrbitalCommand {
                                                             return 0;
                                                         }
                                                     })
+                                            )
+                                    )
+                                    .then(CommandManager.literal("StabStyle")
+                                            .then(CommandManager.argument("shot", StringArgumentType.word())
+                                                    .suggests((context, builder) -> CommandSource.suggestMatching(
+                                                            new String[]{"stab", "squarestab", "circlestab", "starstab"}, builder))
+                                                    .then(CommandManager.argument("style", StringArgumentType.word())
+                                                            .suggests((context, builder) -> CommandSource.suggestMatching(
+                                                                    new String[]{"GAPPED", "STRAIGHT", "ACCURATE"}, builder))
+                                                            .executes(ctx -> {
+                                                                String shot = StringArgumentType.getString(ctx, "shot");
+                                                                String style = StringArgumentType.getString(ctx, "style").toUpperCase();
+
+                                                                switch(shot) {
+                                                                    case "squarestab":
+                                                                        SquareStabShot.STAB_STYLE = style;
+                                                                        break;
+                                                                    case "circlestab":
+                                                                        CircleStabShot.STAB_STYLE = style;
+                                                                        break;
+                                                                    case "starstab":
+                                                                        StarStabShot.STAB_STYLE = style;
+                                                                        break;
+                                                                    default:
+                                                                        ctx.getSource().sendError(Text.literal("Unknown stab shot type"));
+                                                                        return 0;
+                                                                }
+
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Set " + shot + " style to " + style), false);
+                                                                return 1;
+                                                            })
+                                                    )
                                             )
                                     )
 
