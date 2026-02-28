@@ -10,6 +10,7 @@ import com.orbitalstrike.core.rod.OrbitalRodUtil;
 import com.orbitalstrike.core.rod.RodTriggerStyle;
 import com.orbitalstrike.core.shot.OrbitalShot;
 import com.orbitalstrike.core.shot.ShotRegistry;
+import com.orbitalstrike.core.rod.RodNameUpdater;
 import com.orbitalstrike.core.shot.impl.NukeMk2Shot;
 import com.orbitalstrike.core.shot.impl.NukeMk4Shot;
 import com.orbitalstrike.core.shot.impl.NukeMk6Shot;
@@ -36,6 +37,7 @@ public class OrbitalCommand {
     public static boolean ADVANCED_ROD_NAMES = false;
     public static boolean MISS_FAILSAFE = true;
     public static boolean ONE_USE_CREATIVE = true;
+    public static boolean FANCY_RODS = false;
 
     private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
             CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
@@ -147,6 +149,11 @@ public class OrbitalCommand {
                                                             .executes(ctx -> {
                                                                 ADVANCED_ROD_NAMES = BoolArgumentType.getBool(ctx, "value");
                                                                 ctx.getSource().sendFeedback(() -> Text.literal("Advanced rod names set to " + ADVANCED_ROD_NAMES), false);
+
+                                                                for (ServerPlayerEntity player : ctx.getSource().getServer().getPlayerManager().getPlayerList()) {
+                                                                    RodNameUpdater.updateAllPlayerRods(player);
+                                                                }
+
                                                                 return 1;
                                                             })
                                                     )
@@ -165,6 +172,15 @@ public class OrbitalCommand {
                                                             .executes(ctx -> {
                                                                 ONE_USE_CREATIVE = BoolArgumentType.getBool(ctx, "value");
                                                                 ctx.getSource().sendFeedback(() -> Text.literal("One use creative set to " + ONE_USE_CREATIVE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("FancyRods")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                FANCY_RODS = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Fancy rods set to " + FANCY_RODS), false);
                                                                 return 1;
                                                             })
                                                     )
@@ -357,14 +373,20 @@ public class OrbitalCommand {
             OrbitalRodUtil.tag(rod, shotId, delay, size, null, player.getUuidAsString());
 
             String displayName = getNukeDisplayName(shotId);
+            Text rodName;
+
             if (ADVANCED_ROD_NAMES) {
-                rod.set(DataComponentTypes.CUSTOM_NAME,
-                        Text.literal(shotId + " " + delay + " " + size).styled(style -> style.withItalic(true)));
+                rodName = Text.literal(shotId + " " + delay + " " + size).styled(style -> style.withItalic(true));
             } else {
-                rod.set(DataComponentTypes.CUSTOM_NAME,
-                        Text.literal(displayName + " shot").styled(style -> style.withItalic(true)));
+                rodName = Text.literal(displayName + " shot").styled(style -> style.withItalic(true));
             }
 
+            if (FANCY_RODS) {
+                rodName = rodName.copy().styled(style -> style.withBold(true).withColor(0xFFD700));
+                rod.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+            }
+
+            rod.set(DataComponentTypes.CUSTOM_NAME, rodName);
             player.giveItemStack(rod);
         }
 
@@ -395,13 +417,20 @@ public class OrbitalCommand {
             OrbitalRodUtil.tag(rod, shotId, delay, 0, null, player.getUuidAsString());
 
             String displayName = getNukeDisplayName(shotId);
+            Text rodName;
+
             if (ADVANCED_ROD_NAMES) {
-                rod.set(DataComponentTypes.CUSTOM_NAME,
-                        Text.literal(shotId + " " + delay + " 0").styled(style -> style.withItalic(true)));
+                rodName = Text.literal(shotId + " " + delay + " " + "0").styled(style -> style.withItalic(true));
             } else {
-                rod.set(DataComponentTypes.CUSTOM_NAME,
-                        Text.literal(displayName + " shot").styled(style -> style.withItalic(true)));
+                rodName = Text.literal(displayName + " shot").styled(style -> style.withItalic(true));
             }
+
+            if (FANCY_RODS) {
+                rodName = rodName.copy().styled(style -> style.withBold(true).withColor(0xFFD700));
+                rod.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+            }
+
+            rod.set(DataComponentTypes.CUSTOM_NAME, rodName);
 
             player.giveItemStack(rod);
         }
@@ -558,13 +587,20 @@ public class OrbitalCommand {
         OrbitalRodUtil.tag(rod, shotId, delay, size, pos, player.getUuidAsString());
 
         String displayName = getNukeDisplayName(shotId);
+        Text rodName;
+
         if (ADVANCED_ROD_NAMES) {
-            rod.set(DataComponentTypes.CUSTOM_NAME,
-                    Text.literal(shotId + " " + delay + " " + size + " " + pos.toShortString()).styled(style -> style.withItalic(true)));
+            rodName = Text.literal(shotId + " " + delay + " " + size).styled(style -> style.withItalic(true));
         } else {
-            rod.set(DataComponentTypes.CUSTOM_NAME,
-                    Text.literal(displayName + " shot").styled(style -> style.withItalic(true)));
+            rodName = Text.literal(displayName + " shot").styled(style -> style.withItalic(true));
         }
+
+        if (FANCY_RODS) {
+            rodName = rodName.copy().styled(style -> style.withBold(true).withColor(0xFFD700));
+            rod.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        }
+
+        rod.set(DataComponentTypes.CUSTOM_NAME, rodName);
 
         player.giveItemStack(rod);
 
@@ -593,13 +629,20 @@ public class OrbitalCommand {
         OrbitalRodUtil.tag(rod, shotId, delay, 0, pos, player.getUuidAsString());
 
         String displayName = getNukeDisplayName(shotId);
+        Text rodName;
+
         if (ADVANCED_ROD_NAMES) {
-            rod.set(DataComponentTypes.CUSTOM_NAME,
-                    Text.literal(shotId + " " + delay + " 0 " + pos.toShortString()).styled(style -> style.withItalic(true)));
+            rodName = Text.literal(shotId + " " + delay + " " + "no size :(").styled(style -> style.withItalic(true));
         } else {
-            rod.set(DataComponentTypes.CUSTOM_NAME,
-                    Text.literal(displayName + " shot").styled(style -> style.withItalic(true)));
+            rodName = Text.literal(displayName + " shot").styled(style -> style.withItalic(true));
         }
+
+        if (FANCY_RODS) {
+            rodName = rodName.copy().styled(style -> style.withBold(true).withColor(0xFFD700));
+            rod.set(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE, true);
+        }
+
+        rod.set(DataComponentTypes.CUSTOM_NAME, rodName);
 
         player.giveItemStack(rod);
 

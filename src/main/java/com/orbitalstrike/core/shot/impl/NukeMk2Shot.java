@@ -76,6 +76,7 @@ public class NukeMk2Shot implements OrbitalShot {
 
                 TntEntity tnt = new TntEntity(world, pos.x, batch2SpawnY, pos.z, null);
                 tnt.setFuse(TNT_FUSE);
+                tnt.setVelocity(0, 0, 0);
                 world.spawnEntity(tnt);
                 batch2Vectors.put(tnt.getUuid(), new Vec3d(vX, currentVY, vZ));
             }
@@ -83,7 +84,7 @@ public class NukeMk2Shot implements OrbitalShot {
 
         world.getServer().execute(() -> {
             try {
-                Thread.sleep(TNT_FUSE * 50 - 1500);
+                Thread.sleep(2500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
