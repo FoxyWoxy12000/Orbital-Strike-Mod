@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
+import com.orbitalstrike.core.command.OrbitalCommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,11 +75,13 @@ public class NukeMk2Shot implements OrbitalShot {
                 double vX = Math.cos(angle) * speed;
                 double vZ = Math.sin(angle) * speed;
 
-                TntEntity tnt = new TntEntity(world, pos.x, batch2SpawnY, pos.z, null);
-                tnt.setFuse(TNT_FUSE);
-                tnt.setVelocity(0, 0, 0);
-                world.spawnEntity(tnt);
-                batch2Vectors.put(tnt.getUuid(), new Vec3d(vX, currentVY, vZ));
+                if (!OrbitalCommand.MK2_CLOUD_ONLY) {
+                    TntEntity tnt = new TntEntity(world, pos.x, batch2SpawnY, pos.z, null);
+                    tnt.setFuse(TNT_FUSE);
+                    tnt.setVelocity(0, 0, 0);
+                    world.spawnEntity(tnt);
+                    batch2Vectors.put(tnt.getUuid(), new Vec3d(vX, currentVY, vZ));
+                }
             }
         }
 

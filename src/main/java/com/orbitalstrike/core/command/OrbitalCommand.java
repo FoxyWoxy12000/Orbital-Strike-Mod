@@ -38,6 +38,7 @@ public class OrbitalCommand {
     public static boolean MISS_FAILSAFE = true;
     public static boolean ONE_USE_CREATIVE = true;
     public static boolean FANCY_RODS = false;
+    public static boolean MK2_CLOUD_ONLY = false;
 
     private static final SuggestionProvider<ServerCommandSource> SHOT_SUGGESTIONS = (context, builder) ->
             CommandSource.suggestMatching(ShotRegistry.getAllIds(), builder);
@@ -181,6 +182,15 @@ public class OrbitalCommand {
                                                             .executes(ctx -> {
                                                                 FANCY_RODS = BoolArgumentType.getBool(ctx, "value");
                                                                 ctx.getSource().sendFeedback(() -> Text.literal("Fancy rods set to " + FANCY_RODS), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("Mk2NukeCloudOnly")
+                                                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                                                            .executes(ctx -> {
+                                                                MK2_CLOUD_ONLY = BoolArgumentType.getBool(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("Mk2 Cloud Only set to " + MK2_CLOUD_ONLY), false);
                                                                 return 1;
                                                             })
                                                     )
