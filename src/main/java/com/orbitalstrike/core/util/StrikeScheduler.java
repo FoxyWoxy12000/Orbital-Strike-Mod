@@ -23,13 +23,16 @@ public class StrikeScheduler {
     }
 
     private static void tick(MinecraftServer server) {
-        Iterator<Task> it = TASKS.iterator();
-        while (it.hasNext()) {
-            Task t = it.next();
+        // Snapshot current tasks; new schedules during run() go into TASKS fresh
+        LinkedList<Task> current = new LinkedList<>(TASKS);
+        TASKS.clear();
+
+        for (Task t : current) {
             t.delay--;
             if (t.delay <= 0) {
-                t.task.run();
-                it.remove();
+                t.task.run(); // safe — any schedule() calls go into the now-empty TASKS
+            } else {
+                TASKS.add(t); // not ready yet, keep it
             }
         }
     }
