@@ -17,7 +17,7 @@ public class NukeMk6Shot implements OrbitalShot {
     public static double SPEED_STEP = 0.5;
     public static double START_VY = -7.0;
     public static double END_VY = -7.75;
-    public static int TNT_FUSE = 60;
+    public static int TNT_FUSE = 40;
 
     @Override
     public String id() {
