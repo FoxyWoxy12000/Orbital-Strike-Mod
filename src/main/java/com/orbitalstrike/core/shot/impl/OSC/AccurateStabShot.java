@@ -7,8 +7,8 @@ import net.minecraft.util.math.Vec3d;
 
 public class AccurateStabShot implements OrbitalShot {
 
-    public static int PIERCER_COUNT = 160;
-    public static int ACCELERATOR_COUNT = 400;
+    public static int PIERCER_COUNT = 200;
+    public static int ACCELERATOR_COUNT = 450;
     public static int Y_HEIGHT = 319;
     public static int PERICER_FUSE = 2;
     public static int ACCELERATOR_FUSE = 2;
