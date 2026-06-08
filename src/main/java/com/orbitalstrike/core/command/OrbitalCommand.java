@@ -1,11 +1,7 @@
 package com.orbitalstrike.core.command;
 
 import com.mojang.brigadier.context.CommandContext;
-import com.orbitalstrike.core.shot.impl.OSC.NukeMk2Shot;
-import com.orbitalstrike.core.shot.impl.OSC.NukeMk4Shot;
-import com.orbitalstrike.core.shot.impl.OSC.NukeMk6Shot;
-import com.orbitalstrike.core.shot.impl.OSC.AccurateStabShot;
-import com.orbitalstrike.core.shot.impl.OSC.StabShot;
+import com.orbitalstrike.core.shot.impl.OSC.*;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -412,7 +408,72 @@ public class OrbitalCommand {
                                                     )
                                             )
                                     )
-                            )
+                                    .then(CommandManager.literal("accuratebobm")
+                                            .then(CommandManager.literal("PIERCER_COUNT")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                AccurateBobm.PIERCER_COUNT = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("AccurateBobm piercer count set to " + AccurateBobm.PIERCER_COUNT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("ACCELERATOR_COUNT")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                AccurateBobm.ACCELERATOR_COUNT = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("AccurateBobm accelerator count set to " + AccurateBobm.ACCELERATOR_COUNT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("Y_HEIGHT")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                AccurateBobm.Y_HEIGHT = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("AccurateBobm Y height set to " + AccurateBobm.Y_HEIGHT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("ACCELERATOR_FUSE")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                AccurateBobm.ACCELERATOR_FUSE = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("AccurateBobm accelerator fuse set to " + AccurateBobm.ACCELERATOR_FUSE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("PIERCER_FUSE")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                AccurateBobm.PERICER_FUSE = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("AccurateBobm piercer fuse set to " + AccurateBobm.PERICER_FUSE), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                    )
+                                    .then(CommandManager.literal("bobm")
+                                            .then(CommandManager.literal("PIERCER_COUNT")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                BobmShot.BOBM_COUNT = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("BobmShot count set to " + BobmShot.BOBM_COUNT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                                            )
+                                            .then(CommandManager.literal("ACCELERATOR_COUNT")
+                                                    .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
+                                                            .executes(ctx -> {
+                                                                BobmShot.BOBM_COUNT = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("BobmShot fuse set to " + BobmShot.BOBM_COUNT), false);
+                                                                return 1;
+                                                            })
+                                                    )
+                            )       )       )
 
                             // ─────────────────────────────────────────────
                             // /orbital help
@@ -439,7 +500,9 @@ public class OrbitalCommand {
                                             .executes(OrbitalCommand::auth)
                                     )
                             )
-            );
+                    );
+
+
         });
     }
 
