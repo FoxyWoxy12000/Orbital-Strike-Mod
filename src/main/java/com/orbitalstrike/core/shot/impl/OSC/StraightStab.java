@@ -12,7 +12,7 @@ public class StraightStab implements OrbitalShot {
     private static final Random RANDOM = new Random();
 
     public static int DEPTH = 1;
-    public static double OFFSET = 1;
+    public static double OFFSET = 0;
     public static int AMOUNT_PER_PIECE = 1;
 
     @Override
