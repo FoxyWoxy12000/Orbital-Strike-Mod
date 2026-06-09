@@ -35,7 +35,7 @@ public class RodNameUpdater {
     }
 
     private static String getShotDisplayName(String shotId) {
-        if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")) {
+        if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6") || shotId.equals("accuratenuke")) {
             return "nuke";
         }
         if (shotId.equals("stab") || shotId.equals("straightstab") || shotId.equals("accuratestab") ||

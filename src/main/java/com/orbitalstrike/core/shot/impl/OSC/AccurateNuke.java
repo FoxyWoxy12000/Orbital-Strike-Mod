@@ -7,13 +7,13 @@ import net.minecraft.util.math.Vec3d;
 
 public class AccurateNuke implements OrbitalShot {
 
-    public static int Y_OFFSET = 80;
-    public static int ACCELERATOR_COUNT = 2;
-    public static int ACCELERATOR_FUSE = 15;
+    public static int Y_OFFSET = 120;
+    public static int ACCELERATOR_COUNT = 1;
+    public static int ACCELERATOR_FUSE = 65;
     public static int NUKE_COUNT = 24;
     public static int NUKE_FUSE = 80;
     public static int SWING_COUNT = 4;
-    public static int SWING_FUSE = 16;
+    public static int SWING_FUSE = 64;
 
     @Override
     public String id() {
@@ -41,6 +41,8 @@ public class AccurateNuke implements OrbitalShot {
             for (int am = 0; am < NUKE_COUNT; am++) {
                 TntEntity nuke = new TntEntity(world, pos.x, pos.y + Y_OFFSET, pos.z, null);
                 nuke.setFuse(NUKE_FUSE);
+                Vec3d vel = nuke.getVelocity();
+                nuke.setVelocity(vel.x, 0.0, vel.z);
                 world.spawnEntity(nuke);
             }
         }
