@@ -7,7 +7,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class BobmShot implements OrbitalShot {
 
-    public static int BOBM_COUNT = 200;
+    public static int BOBM_COUNT = 100;
     public static int BOBM_FUSE = 1;
 
 

@@ -48,7 +48,7 @@ public class OrbitalCommand {
     private static final SuggestionProvider<ServerCommandSource> SMART_SIZE_SUGGESTIONS = (context, builder) -> {
         try {
             String shotId = context.getArgument("shot", String.class);
-            if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")) {
+            if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6") || shotId.equals("accuratenuke")) {
                 return CommandSource.suggestMatching(new String[]{"12", "16"}, builder);
             }
         } catch (IllegalArgumentException e) {
@@ -58,11 +58,14 @@ public class OrbitalCommand {
     };
 
     private static String getShotDisplayName(String shotId) {
-        if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")) {
+        if (shotId.equals("nukemk4") || shotId.equals("nukemk2") || shotId.equals("nukemk6")|| shotId.equals("accuratenuke")) {
             return "nuke";
         }
         if (shotId.equals("stab") || shotId.equals("accuratestab")) {
             return "stab";
+        }
+        if (shotId.equals("bobm") || shotId.equals("accuratebobm")) {
+            return "bobm";
         }
         return shotId;
     }
