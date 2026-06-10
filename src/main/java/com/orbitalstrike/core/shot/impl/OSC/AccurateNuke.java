@@ -12,7 +12,7 @@ public class AccurateNuke implements OrbitalShot {
     public static int ACCELERATOR_FUSE = 65;
     public static int NUKE_COUNT = 24;
     public static int NUKE_FUSE = 80;
-    public static int SWING_COUNT = 4;
+    public static int SWING_COUNT = 9;
     public static int SWING_FUSE = 64;
 
     @Override
