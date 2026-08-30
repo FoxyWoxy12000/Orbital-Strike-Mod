@@ -10,10 +10,12 @@ public class AccurateNuke implements OrbitalShot {
     public static int Y_OFFSET = 120;
     public static int ACCELERATOR_COUNT = 1;
     public static int ACCELERATOR_FUSE = 65;
-    public static int NUKE_COUNT = 64;
+    public static int NUKE_COUNT = 48;
+    public static int NUKE_ADDITIVE = 16;
     public static int NUKE_FUSE = 80;
     public static int SWING_COUNT = 9;
     public static int SWING_FUSE = 64;
+    public static double SPREAD = 0.1;
 
     @Override
     public String id() {
@@ -23,13 +25,11 @@ public class AccurateNuke implements OrbitalShot {
     @Override
     public void fire(ServerWorld world, Vec3d pos, int size) {
 
+        if (size > 32) size = 32;
         int RINGS = Math.max(size, 1);
 
-        if (size > 32) {
-            size = 32;
-        }
-
         for (int i = 0; i < RINGS; i++) {
+            int nukeCountThisRing = NUKE_COUNT + i * NUKE_ADDITIVE;
 
             for (int bm = 0; bm < ACCELERATOR_COUNT; bm++) {
                 TntEntity accelerator = new TntEntity(world, pos.x, pos.y + Y_OFFSET, pos.z, null);
@@ -38,11 +38,16 @@ public class AccurateNuke implements OrbitalShot {
                 world.spawnEntity(accelerator);
             }
 
-            for (int am = 0; am < NUKE_COUNT; am++) {
-                TntEntity nuke = new TntEntity(world, pos.x, pos.y + Y_OFFSET, pos.z, null);
+            for (int am = 0; am < nukeCountThisRing; am++) {
+                double angle = world.random.nextDouble() * Math.PI * 2;
+                double radius = Math.sqrt(world.random.nextDouble()) * SPREAD;
+
+                double offsetX = Math.cos(angle) * radius;
+                double offsetZ = Math.sin(angle) * radius;
+
+                TntEntity nuke = new TntEntity(world, pos.x + offsetX, pos.y + Y_OFFSET, pos.z + offsetZ, null);
                 nuke.setFuse(NUKE_FUSE);
-                Vec3d vel = nuke.getVelocity();
-                nuke.setVelocity(vel.x, 0.0, vel.z);
+                nuke.setVelocity(0.0, 0.0, 0.0);
                 world.spawnEntity(nuke);
             }
         }
