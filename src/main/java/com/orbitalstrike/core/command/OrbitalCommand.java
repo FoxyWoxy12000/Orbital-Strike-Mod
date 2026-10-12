@@ -18,6 +18,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.command.permission.Permissions;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -27,6 +28,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.command.permission.Permissions;
 
 public class OrbitalCommand {
 
@@ -74,10 +76,7 @@ public class OrbitalCommand {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, env) -> {
             dispatcher.register(
                     CommandManager.literal("orbital")
-
-                            // ─────────────────────────────────────────────
-                            // /orbital give
-                            // ─────────────────────────────────────────────
+                            .requires(CommandManager.requirePermissionLevel(CommandManager.ADMINS_CHECK))
                             .then(CommandManager.literal("give")
                                     .then(CommandManager.argument("shot", StringArgumentType.word())
                                             .suggests(SHOT_SUGGESTIONS)
