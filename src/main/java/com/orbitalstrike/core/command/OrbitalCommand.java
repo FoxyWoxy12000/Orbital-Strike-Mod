@@ -403,8 +403,8 @@ public class OrbitalCommand {
                                             .then(CommandManager.literal("TRIGGER_FUSE")
                                                     .then(CommandManager.argument("value", IntegerArgumentType.integer(1))
                                                             .executes(ctx -> {
-                                                                AccurateStabShot.TRIGGER_FUSE = IntegerArgumentType.getInteger(ctx, "value");
-                                                                ctx.getSource().sendFeedback(() -> Text.literal("AccurateStab trigger fuse set to " + AccurateStabShot.TRIGGER_FUSE), false);
+                                                                AccurateStabShot.SEPARATOR_FUSE = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("AccurateStab trigger fuse set to " + AccurateStabShot.SEPARATOR_FUSE), false);
                                                                 return 1;
                                                             })
                                                     )

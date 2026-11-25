@@ -12,7 +12,7 @@ public class AccurateStabShot implements OrbitalShot {
     public static int Y_HEIGHT = 319;
     public static int PERICER_FUSE = 2;
     public static int ACCELERATOR_FUSE = 2;
-    public static int TRIGGER_FUSE = 1;
+    public static int SEPARATOR_FUSE = 1;
     //public static int REPITIONS = 20;
 
     @Override
@@ -25,7 +25,6 @@ public class AccurateStabShot implements OrbitalShot {
 
         //for (int cm = 0; cm < REPITIONS; cm++) {
 
-
             for (int bm = 0; bm < ACCELERATOR_COUNT; bm++) {
                 TntEntity accelerator = new TntEntity(world, pos.x, Y_HEIGHT, pos.z, null);
                 accelerator.setFuse(ACCELERATOR_FUSE);
@@ -34,7 +33,7 @@ public class AccurateStabShot implements OrbitalShot {
             }
 
                 TntEntity trigger = new TntEntity(world, pos.x, Y_HEIGHT, pos.z, null);
-                trigger.setFuse(TRIGGER_FUSE);
+                trigger.setFuse(SEPARATOR_FUSE);
                 trigger.setVelocity(0.0, 0.0, 0.0);
                 world.spawnEntity(trigger);
 
