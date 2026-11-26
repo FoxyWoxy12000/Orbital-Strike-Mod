@@ -14,7 +14,7 @@ public class AccurateNuke implements OrbitalShot {
     public static int NUKE_FUSE = 80;
     public static int SWING_COUNT = 9;
     public static int SWING_FUSE = 64;
-    public static double SPREAD = 0.1;
+    public static double KICK_OFFSET = 0.02;
 
     @Override
     public String id() {
@@ -35,18 +35,14 @@ public class AccurateNuke implements OrbitalShot {
                 world.spawnEntity(accelerator);
             }
             for (int am = 0; am < NUKE_COUNT; am++) {
-                /*
-                double angle = world.random.nextDouble() * Math.PI * 2;
-                double radius = Math.sqrt(world.random.nextDouble()) * SPREAD;
-
-                double offsetX = Math.cos(angle) * radius;
-                double offsetZ = Math.sin(angle) * radius;
+                // same math as the TntEntity constructor, but as a position offset
+                double d = world.random.nextDouble() * Math.PI * 2;
+                double offsetX = -Math.sin(d) * KICK_OFFSET;
+                double offsetZ = -Math.cos(d) * KICK_OFFSET;
 
                 TntEntity nuke = new TntEntity(world, pos.x + offsetX, pos.y + Y_OFFSET, pos.z + offsetZ, null);
-                */
-                TntEntity nuke = new TntEntity(world, pos.x, pos.y + Y_OFFSET, pos.z, null);
+                nuke.setVelocity(0.0, 0.0, 0.0);
                 nuke.setFuse(NUKE_FUSE);
-                //nuke.setVelocity(0.0, 0.0, 0.0);
                 world.spawnEntity(nuke);
             }
         }
