@@ -11,9 +11,9 @@ import java.util.List;
 
 public class NukeMk6Shot implements OrbitalShot {
 
-    public static int Y_OFFSET = 120;
+    public static int Y_OFFSET = 110;
     public static int TNT_FUSE = 80;
-    public static int BLAST_DELAY = 64;      // ticks of free fall before the "blast out"
+    public static int BLAST_DELAY = 48;      // ticks of free fall before the "blast out"
 
     public static double BASE_SPEED = 0.15;  // horizontal speed of ring 1
     public static double SPEED_STEP = 0.5;   // added per ring
@@ -21,8 +21,8 @@ public class NukeMk6Shot implements OrbitalShot {
     public static int COUNT_STEP = 15;       // extra TNT per ring
 
     // extra vertical velocity added on top of the fall speed, ring 1 -> last ring
-    public static double START_VY = 0.0;
-    public static double END_VY = -0.5;
+    public static double START_VY = -1.0;
+    public static double END_VY = -1.5;
 
     private record Payload(TntEntity tnt, double vx, double vyExtra, double vz) {}
 
