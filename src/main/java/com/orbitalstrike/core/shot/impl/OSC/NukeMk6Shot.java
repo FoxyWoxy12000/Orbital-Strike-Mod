@@ -62,6 +62,7 @@ public class NukeMk6Shot implements OrbitalShot {
 
         // payload falls normally, then everything gets "blasted" on the same tick
         TickScheduler.schedule(BLAST_DELAY, () -> {
+            System.out.println("[Mk6] blast fired, payloads=" + payloads.size());
             for (Payload p : payloads) {
                 if (p.tnt().isRemoved()) continue;
                 Vec3d cur = p.tnt().getVelocity();

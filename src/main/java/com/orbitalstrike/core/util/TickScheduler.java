@@ -32,7 +32,13 @@ public final class TickScheduler {
                     TASKS.remove(i);
                 }
             }
-            due.forEach(Runnable::run);
+            due.forEach(r -> {
+                try {
+                    r.run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 

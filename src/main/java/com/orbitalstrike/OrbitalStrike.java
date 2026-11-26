@@ -12,6 +12,7 @@ import com.orbitalstrike.core.shot.impl.OSC.NukeMk6Shot;
 import com.orbitalstrike.core.shot.impl.OSC.StabShot;
 import com.orbitalstrike.core.shot.impl.OSC.StraightStab;
 import com.orbitalstrike.core.util.StrikeScheduler;
+import com.orbitalstrike.core.util.TickScheduler;
 import com.orbitalstrike.platform.OrbitalPlatform;
 import com.orbitalstrike.fabric.FabricPlatform;
 import net.fabricmc.api.ModInitializer;
@@ -23,6 +24,7 @@ public class OrbitalStrike implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        TickScheduler.init();
         PLATFORM = new FabricPlatform();
 
         ShotRegistry.register(new AccurateStabShot());
