@@ -305,8 +305,8 @@ public class OrbitalCommand {
                                             .then(CommandManager.literal("OFFSET_HEIGHT")
                                                     .then(CommandManager.argument("value", IntegerArgumentType.integer(0))
                                                             .executes(ctx -> {
-                                                                NukeMk6Shot.OFFSET_HEIGHT = IntegerArgumentType.getInteger(ctx, "value");
-                                                                ctx.getSource().sendFeedback(() -> Text.literal("NukeMk6 offset height set to " + NukeMk6Shot.OFFSET_HEIGHT), false);
+                                                                NukeMk6Shot.Y_OFFSET = IntegerArgumentType.getInteger(ctx, "value");
+                                                                ctx.getSource().sendFeedback(() -> Text.literal("NukeMk6 offset height set to " + NukeMk6Shot.Y_OFFSET), false);
                                                                 return 1;
                                                             })
                                                     )

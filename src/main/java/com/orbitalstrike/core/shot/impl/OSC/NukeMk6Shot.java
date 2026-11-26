@@ -1,23 +1,30 @@
 package com.orbitalstrike.core.shot.impl.OSC;
 
 import com.orbitalstrike.core.shot.OrbitalShot;
-import net.minecraft.entity.Entity;
+import com.orbitalstrike.core.util.TickScheduler;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NukeMk6Shot implements OrbitalShot {
 
-    public static int OFFSET_HEIGHT = 150;
-    public static double BASE_SPEED = 0.15;
-    public static double SPEED_STEP = 0.5;
-    public static double START_VY = -7.0;
-    public static double END_VY = -7.75;
-    public static int TNT_FUSE = 40;
+    public static int Y_OFFSET = 120;
+    public static int TNT_FUSE = 80;
+    public static int BLAST_DELAY = 64;      // ticks of free fall before the "blast out"
+
+    public static double BASE_SPEED = 0.15;  // horizontal speed of ring 1
+    public static double SPEED_STEP = 0.5;   // added per ring
+    public static int BASE_COUNT = 15;       // TNT in ring 1
+    public static int COUNT_STEP = 15;       // extra TNT per ring
+
+    // extra vertical velocity added on top of the fall speed, ring 1 -> last ring
+    public static double START_VY = 0.0;
+    public static double END_VY = -0.5;
+
+    private record Payload(TntEntity tnt, double vx, double vyExtra, double vz) {}
 
     @Override
     public String id() {
@@ -26,54 +33,44 @@ public class NukeMk6Shot implements OrbitalShot {
 
     @Override
     public void fire(ServerWorld world, Vec3d pos, int size) {
-        if (size > 32) {
-            size = 32;
-        }
+        if (size > 32) size = 32;
+        int totalRings = Math.max(size, 1);
+        double spawnY = pos.y + Y_OFFSET;
 
-        double spawnY = pos.y + OFFSET_HEIGHT;
-        int totalRings = Math.max(size, 2);
-        Map<UUID, Vec3d> vectors = new HashMap<>();
+        List<Payload> payloads = new ArrayList<>();
 
         for (int r = 1; r <= totalRings; r++) {
             double ringSpeed = BASE_SPEED + (r - 1) * SPEED_STEP;
-            int tntCount = r == totalRings ? (15 + (r - 2) * 15) * 2 : 15 + (r - 1) * 15;
-            double progress = (double)r / totalRings;
-            double vY = outQuad(START_VY, END_VY, progress);
+            int count = BASE_COUNT + (r - 1) * COUNT_STEP;
+            double progress = (double) r / totalRings;
+            double vyExtra = outQuad(START_VY, END_VY, progress);
 
-            for (int i = 0; i < tntCount; i++) {
+            for (int i = 0; i < count; i++) {
                 double angle = world.random.nextDouble() * Math.PI * 2.0;
-                double vX = Math.cos(angle) * ringSpeed;
-                double vZ = Math.sin(angle) * ringSpeed;
 
                 TntEntity tnt = new TntEntity(world, pos.x, spawnY, pos.z, null);
+                tnt.setVelocity(0.0, 0.0, 0.0);   // no hop, they all start stacked
                 tnt.setFuse(TNT_FUSE);
                 world.spawnEntity(tnt);
-                vectors.put(tnt.getUuid(), new Vec3d(vX, vY, vZ));
+
+                payloads.add(new Payload(tnt,
+                        Math.cos(angle) * ringSpeed,
+                        vyExtra,
+                        Math.sin(angle) * ringSpeed));
             }
         }
 
-        world.getServer().execute(() -> {
-            try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        // payload falls normally, then everything gets "blasted" on the same tick
+        TickScheduler.schedule(BLAST_DELAY, () -> {
+            for (Payload p : payloads) {
+                if (p.tnt().isRemoved()) continue;
+                Vec3d cur = p.tnt().getVelocity();
+                p.tnt().setVelocity(p.vx(), cur.y + p.vyExtra(), p.vz());
             }
-            applyVectors(world, vectors);
         });
     }
 
     private double outQuad(double start, double end, double progress) {
         return start + (end - start) * (1.0 - (1.0 - progress) * (1.0 - progress));
-    }
-
-    private void applyVectors(ServerWorld world, Map<UUID, Vec3d> vectors) {
-        for (Map.Entry<UUID, Vec3d> entry : vectors.entrySet()) {
-            Entity entity = world.getEntity(entry.getKey());
-            if (entity instanceof TntEntity) {
-                TntEntity tnt = (TntEntity) entity;
-                Vec3d velocity = entry.getValue();
-                tnt.setVelocity(velocity.x, velocity.y, velocity.z);
-            }
-        }
     }
 }
